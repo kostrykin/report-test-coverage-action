@@ -21,7 +21,10 @@ jobs:
   
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request' || github.ref_name == 'master'
-    permissions: write-all
+    
+    permissions:
+      issues: write
+      pull-requests: write
     
     steps:
 
@@ -30,7 +33,7 @@ jobs:
 
       - uses: kostrykin/report-test-coverage-action@master
         with:
-          report: example
+          working-directory: example
           github-auth: ${{ secrets.GITHUB_TOKEN }}
           gist-id: d152375a04f7ab9ee9b247de41245b24
           gist-auth: ${{ secrets.GIST_SECRET }}

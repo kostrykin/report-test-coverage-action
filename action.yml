@@ -2,15 +2,15 @@ name: 'Report test coverage'
 description: 'Run tests and report the test coverage'
 inputs:
 
-  shell:
-    description: Shell to be used for running commands
-    default: bash
-
   run:
     description: Commands to run the test suite and compute the test coverage
     default: |
       coverage run -m unittest discover
       python -m coverage json --omit "tests/*"
+
+  working-directory:
+    description: Directory in which the test suite will be run
+    default: '.'
 
   report:
     description: Report the test coverage
@@ -30,7 +30,7 @@ inputs:
 
   gist-filename:
     description: Filename to assign to the gist
-    default: 'coverage.json'
+    default: coverage.json
 
 outputs:
 
@@ -49,8 +49,10 @@ runs:
         sudo apt install -y jq
 
     - name: Run test suite
-      shell: ${{ inputs.shell }}
-      run: ${{ inputs.run }}
+      shell: bash
+      run:
+        cd ${{ inputs.working-directory }}
+        ${{ inputs.run }}
 
     - name: Fetch coverage
       if: inputs.report == 'true'
