@@ -45,6 +45,7 @@ runs:
 
     - name: Install jq
       if: inputs.report == 'true'
+      shell: bash
       run: |
         sudo apt install -y jq
 
