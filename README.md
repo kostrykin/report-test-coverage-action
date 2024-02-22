@@ -6,7 +6,7 @@ Determines the test coverage of a Python module using [*coverage.py*](https://co
 Generates a badge for the determined coverage when triggered by a `push` event.
 When triggered by a `pull_request` event, the determined coverage is added as a comment to the corresponding pull request.
 
-<img width="354" src="https://github.com/kostrykin/report-test-coverage-action/assets/6557139/8f86129a-342b-4f90-ac92-c2137baba8ae">
+<img width="907" src="https://github.com/kostrykin/report-test-coverage-action/assets/6557139/75bab889-fd88-4ac1-91f9-22b6f2836783">
 
 Example badge generated using this action:
 
