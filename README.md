@@ -1,1 +1,1 @@
-# report-test-coverage-action
+# *[report-test-coverage-action](https://github.com/kostrykin/report-test-coverage-action)*
