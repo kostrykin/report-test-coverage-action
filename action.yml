@@ -44,7 +44,6 @@ runs:
   steps:
 
     - name: Install dependencies
-      if: inputs.report == 'true'
       shell: bash
       run: |
         sudo apt install -y jq
