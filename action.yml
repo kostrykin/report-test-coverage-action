@@ -1,0 +1,86 @@
+name: 'Report test coverage'
+description: 'Run tests and report the test coverage'
+inputs:
+
+  shell:
+    description: Shell to be used for running commands
+    default: bash
+
+  run:
+    description: Commands to run the test suite and compute the test coverage
+    default: |
+      coverage run -m unittest discover
+      python -m coverage json --omit "tests/*"
+
+  report:
+    description: Report the test coverage
+    default: 'true'
+
+  github-auth:
+    description: Authentication token used to comment on pull requests
+    required: 'true'
+
+  gist-id:
+    description: Gist ID where to store the coverage results
+    required: 'true'
+
+  gist-auth:
+    description: Authentication token used to update the gist
+    required: 'true'
+
+  gist-filename:
+    description: Filename to assign to the gist
+    default: 'coverage.json'
+
+outputs:
+
+  coverage:
+    description: The test coverage (value between 0 and 100)
+    value: ${{ steps.coverage.outputs.coverage }}
+
+runs:
+
+  using: "composite"
+  steps:
+
+    - name: Install jq
+      if: inputs.report == 'true'
+      run: |
+        sudo apt install -y jq
+
+    - name: Run test suite
+      shell: ${{ inputs.shell }}
+      run: ${{ inputs.run }}
+
+    - name: Fetch coverage
+      if: inputs.report == 'true'
+      id: coverage
+      shell: bash
+      run: |
+        echo "coverage=$(jq -r '[.totals.percent_covered_display][0]' coverage.json)" >> $GITHUB_OUTPUT
+
+    - name: Report coverage in pull request
+      if: inputs.report == 'true' && github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        github-token: ${{ inputs.github-auth }}
+        script: |
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: 'Test coverage of this pull request: **${{ steps.coverage.outputs.coverage }}%**'
+          })
+
+    - name: Create badge
+      if: inputs.report == 'true' && github.event_name == 'push'
+      uses: schneegans/dynamic-badges-action@v1.7.0
+      with:
+        auth: ${{ inputs.gist-auth }}
+        gistID: ${{ inputs.gist-id }}
+        filename: ${{ inputs.gist-filename }}
+        label: Coverage
+        message: ${{ steps.coverage.outputs.coverage }}%
+        minColorRange: 50
+        maxColorRange: 90
+        valColorRange: ${{ steps.coverage.outputs.coverage }}
