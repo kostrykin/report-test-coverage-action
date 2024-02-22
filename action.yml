@@ -43,16 +43,17 @@ runs:
   using: "composite"
   steps:
 
-    - name: Install jq
+    - name: Install dependencies
       if: inputs.report == 'true'
       shell: bash
       run: |
         sudo apt install -y jq
+        pip install coverage
 
     - name: Run test suite
       shell: bash
       run:
-        cd ${{ inputs.working-directory }}
+        cd ${{ inputs.working-directory }};
         ${{ inputs.run }}
 
     - name: Fetch coverage

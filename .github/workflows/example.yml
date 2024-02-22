@@ -21,7 +21,16 @@ jobs:
   
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request' || github.ref_name == 'master'
-    
+
+    strategy:
+      matrix:
+        python-version:
+        - "3.8"
+        - "3.9"
+        - "3.10"
+        - "3.11"
+        - "3.12"
+
     permissions:
       issues: write
       pull-requests: write
@@ -31,8 +40,14 @@ jobs:
       - name: Initialize
         uses: actions/checkout@v4
 
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
       - uses: kostrykin/report-test-coverage-action@master
         with:
+          report: ${{ strategy.job-index == 0 }}
           working-directory: example
           github-auth: ${{ secrets.GITHUB_TOKEN }}
           gist-id: d152375a04f7ab9ee9b247de41245b24
