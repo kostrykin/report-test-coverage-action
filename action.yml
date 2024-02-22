@@ -51,14 +51,14 @@ runs:
 
     - name: Run test suite
       shell: bash
-      run:
-        cd ${{ inputs.working-directory }};
-        ${{ inputs.run }}
+      working-directory: ${{ inputs.working-directory }}
+      run: ${{ inputs.run }}
 
     - name: Fetch coverage
       if: inputs.report == 'true'
       id: coverage
       shell: bash
+      working-directory: ${{ inputs.working-directory }}
       run: |
         echo "coverage=$(jq -r '[.totals.percent_covered_display][0]' coverage.json)" >> $GITHUB_OUTPUT
 
