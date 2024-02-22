@@ -48,4 +48,5 @@ Example badge generated using this action:
 For a full example, see the workflow file *.github/workflows/example.yml* and the *example/* directory.
 
 List of further examples:
+- https://github.com/BMCV/segmetrics
 - https://github.com/kostrykin/pypers
