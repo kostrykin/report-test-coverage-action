@@ -1,8 +1,8 @@
-import * from module
-import testsuite
+import module
+import unittest
 
 
-class ModuleTest(testsuite.TestCase):
+class ModuleTest(unittest.TestCase):
 
     def test_divide(self):
         actual = module.divide(5, 2)
