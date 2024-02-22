@@ -46,3 +46,6 @@ Example badge generated using this action:
    You can also specify a `working-directory` as a relative path to the root of the repository (e.g., `./example`) if your Python module and the corresponding `tests` directory are not direct descendents of the repository root.
 
 For a full example, see the workflow file *.github/workflows/example.yml* and the *example/* directory.
+
+List of further examples:
+- https://github.com/kostrykin/pypers
