@@ -1,0 +1,37 @@
+name: Report test coverage example
+
+on:
+
+  push:
+  
+    paths:
+      - 'example/**'
+      - '.github/workflows/example.yml'
+      - 'action.yml'
+      
+  pull_request:
+  
+    branches:
+      - '*'
+
+
+jobs:
+
+  test_example:
+  
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' || github.ref_name == 'master'
+    permissions: write-all
+    
+    steps:
+
+      - name: Initialize
+        uses: actions/checkout@v4
+
+      - uses: kostrykin/report-test-coverage-action@master
+        with:
+          report: example
+          github-auth: ${{ secrets.GITHUB_TOKEN }}
+          gist-id: d152375a04f7ab9ee9b247de41245b24
+          gist-auth: ${{ secrets.GIST_SECRET }}
+          gist-filename: report-test-coverage-action.json
