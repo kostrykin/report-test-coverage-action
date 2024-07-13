@@ -50,3 +50,4 @@ For a full example, see the workflow file *.github/workflows/example.yml* and th
 **List of further examples:**
 - https://github.com/BMCV/segmetrics
 - https://github.com/kostrykin/pypers
+- https://github.com/kostrykin/tournaments
