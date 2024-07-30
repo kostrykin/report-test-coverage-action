@@ -45,7 +45,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - uses: kostrykin/report-test-coverage-action@master
+      - uses: ./
         with:
           report: ${{ strategy.job-index == 0 }}
           working-directory: ./example
