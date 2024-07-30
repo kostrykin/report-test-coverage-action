@@ -72,7 +72,7 @@ runs:
             issue_number: context.issue.number,
             owner: context.repo.owner,
             repo: context.repo.repo,
-            body: 'Test coverage of ${{ env.GITHUB_SHA }}: **${{ steps.coverage.outputs.coverage }}%**'
+            body: 'Test coverage of ${{ github.sha }}: **${{ steps.coverage.outputs.coverage }}%**'
           })
 
     - name: Create badge
