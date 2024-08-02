@@ -1,4 +1,5 @@
 name: 'Report test coverage'
+icon: 'file-text'
 description: 'Run tests and report the test coverage'
 inputs:
 
