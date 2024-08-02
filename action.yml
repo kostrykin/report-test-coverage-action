@@ -1,6 +1,10 @@
 name: 'Report test coverage'
-icon: 'file-text'
 description: 'Run tests and report the test coverage'
+
+branding:
+  icon: 'file-text'
+  color: 'green'
+
 inputs:
 
   run:
