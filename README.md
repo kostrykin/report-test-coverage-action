@@ -52,5 +52,4 @@ For a full example, see the workflow file *.github/workflows/example.yml* and th
 - https://github.com/BMCV/segmetrics
 - https://github.com/kosmotive/cs2pb
 - https://github.com/kostrykin/repype
-- https://github.com/kostrykin/pypers
 - https://github.com/kostrykin/tournaments
