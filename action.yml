@@ -8,39 +8,40 @@ branding:
 inputs:
 
   run:
-    description: Commands to run the test suite and compute the test coverage
+    description: 'Commands to run the test suite and compute the test coverage (only for the `pull_requrst` and `push` triggers).'
     default: |
       coverage run -m unittest discover
       python -m coverage json --omit "tests/*"
 
   working-directory:
-    description: Directory in which the test suite will be run
+    description: 'Directory in which the test suite will be run (only for the `pull_requrst` and `push` triggers).'
     default: '.'
 
   report:
-    description: Report the test coverage
+    description: 'Report the test coverage.'
     default: 'true'
 
   github-auth:
-    description: Authentication token used to comment on pull requests
+    description: 'Authentication token used to comment on pull requests (only for the `workflow_run` trigger).'
     required: 'true'
+    default: ${{ github.token }}
 
   gist-id:
-    description: Gist ID where to store the coverage results
+    description: 'Gist ID where to store the coverage results (only for the `pull_requrst` and `push` triggers).'
     required: 'true'
 
   gist-auth:
-    description: Authentication token used to update the gist
+    description: 'Authentication token used to update the gist (only for the `pull_requrst` and `push` triggers).'
     required: 'true'
 
   gist-filename:
-    description: Filename to assign to the gist
+    description: 'Filename to assign to the gist (only for the `pull_requrst` and `push` triggers).'
     default: coverage.json
 
 outputs:
 
   coverage:
-    description: The test coverage (value between 0 and 100)
+    description: 'The test coverage (value between 0 and 100, only for the `pull_requrst` and `push` triggers).'
     value: ${{ steps.coverage.outputs.coverage }}
 
 runs:
@@ -48,37 +49,43 @@ runs:
   using: "composite"
   steps:
 
+  # --------------------------------------------------------------------------------------
+  # Pull request / Push
+  # --------------------------------------------------------------------------------------
+
     - name: Install dependencies
+      if: github.event_name == 'pull_request' || github.event_name == 'push'
       shell: bash
       run: |
         sudo apt install -y jq
         pip install coverage
 
     - name: Run test suite
+      if: github.event_name == 'pull_request' || github.event_name == 'push'
       shell: bash
       working-directory: ${{ inputs.working-directory }}
       run: ${{ inputs.run }}
 
     - name: Fetch coverage
-      if: inputs.report == 'true'
+      if: inputs.report == 'true' && (github.event_name == 'pull_request' || github.event_name == 'push')
       id: coverage
       shell: bash
       working-directory: ${{ inputs.working-directory }}
       run: |
         echo "coverage=$(jq -r '[.totals.percent_covered_display][0]' coverage.json)" >> $GITHUB_OUTPUT
-
-    - name: Report coverage in pull request
+  
+    - name: Prepare a comment for the pull request
       if: inputs.report == 'true' && github.event_name == 'pull_request'
-      uses: actions/github-script@v7
-      with:
-        github-token: ${{ inputs.github-auth }}
-        script: |
-          github.rest.issues.createComment({
-            issue_number: context.issue.number,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: 'Test coverage of ${{ github.event.pull_request.head.sha }}: **${{ steps.coverage.outputs.coverage }}%**'
-          })
+      shell: bash
+      run: |
+        echo "{
+          \"issue_number\": $ISSUE_NUMBER,
+          \"body\": \"Test coverage of $HEAD_SHA: **$COVERAGE%**\"
+        }" >> comment.json
+      env:
+        ISSUE_NUMBER: ${{ github.event.number }}
+        HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        COVERAGE: ${{ steps.coverage.outputs.coverage }}
 
     - name: Create badge
       if: inputs.report == 'true' && github.event_name == 'push'
@@ -92,3 +99,36 @@ runs:
         minColorRange: 50
         maxColorRange: 90
         valColorRange: ${{ steps.coverage.outputs.coverage }}
+
+  # --------------------------------------------------------------------------------------
+  # Workflow run
+  # --------------------------------------------------------------------------------------
+
+    - name: Download the comment artifact
+      if: inputs.report == 'true' && github.event_name == 'workflow_run'
+      uses: actions/download-artifact@v4.1.1
+      continue-on-error: true
+      with:
+        name: comment
+        run-id: ${{ github.event.workflow_run.id }}
+        github-token: ${{ inputs.github_token }}
+
+    - name: Read comment artifact
+      if: inputs.report == 'true' && github.event_name == 'workflow_run'
+      continue-on-error: true
+      shell: bash
+      run: echo "comment_json=$(jq -c . < comment.json)" >> $GITHUB_ENV
+
+    - name: Create the comment
+      if: inputs.report == 'true' && github.event_name == 'workflow_run'
+      uses: actions/github-script@v7
+      continue-on-error: true
+      with:
+        github-token: ${{ inputs.github-auth }}
+        script: |
+          github.rest.issues.createComment({
+            issue_number: ${{ fromJSON(env.comment_json).issue_number }},
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: '${{ fromJSON(env.comment_json).body }}'
+          })

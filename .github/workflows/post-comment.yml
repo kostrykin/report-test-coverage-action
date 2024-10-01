@@ -1,0 +1,21 @@
+name: Post pull request comment
+
+on:
+  workflow_run:
+    workflows: [Report test coverage example]
+    types: [completed]
+
+jobs:
+  post_pr_comment:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+
+      - name: Initialize
+        uses: actions/checkout@v4
+
+      - uses: ./
+        with:
+          github-auth: ${{ secrets.GITHUB_TOKEN }}

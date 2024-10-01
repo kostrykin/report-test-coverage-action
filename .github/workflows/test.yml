@@ -1,39 +1,27 @@
 name: Report test coverage example
 
 on:
-
   push:
-  
     paths:
       - 'example/**'
-      - '.github/workflows/example.yml'
+      - '.github/workflows/test.yml'
       - 'action.yml'
-      
   pull_request:
-  
     branches:
       - '*'
 
-
 jobs:
-
   test_example:
-  
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request' || github.ref_name == 'master'
 
     strategy:
       matrix:
         python-version:
-        - "3.8"
         - "3.9"
         - "3.10"
         - "3.11"
         - "3.12"
-
-    permissions:
-      issues: write
-      pull-requests: write
     
     steps:
 
@@ -49,7 +37,6 @@ jobs:
         with:
           report: ${{ strategy.job-index == 0 }}
           working-directory: ./example
-          github-auth: ${{ secrets.GITHUB_TOKEN }}
           gist-id: d152375a04f7ab9ee9b247de41245b24
           gist-auth: ${{ secrets.GIST_SECRET }}
           gist-filename: report-test-coverage-action.json
