@@ -87,6 +87,13 @@ runs:
         HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         COVERAGE: ${{ steps.coverage.outputs.coverage }}
 
+    - name: Upload the comment as an artifact
+      if: inputs.report == 'true' && github.event_name == 'pull_request'
+      uses: actions/upload-artifact@v4
+      with:
+        name: comment
+        path: comment.json
+
     - name: Create badge
       if: inputs.report == 'true' && github.event_name == 'push'
       uses: schneegans/dynamic-badges-action@v1.7.0
