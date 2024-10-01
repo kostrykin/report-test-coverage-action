@@ -34,7 +34,6 @@ Example badge generated using this action:
    - uses: kostrykin/report-test-coverage-action@v1.1.0
      with:
        gist-id: d152375a04f7ab9ee9b247de41245b24
-       github-auth: ${{ secrets.GITHUB_TOKEN }}
        gist-auth: ${{ secrets.GIST_SECRET }}
    ```
    When embedded into a matrix strategy (e.g., for testing multiple Python versions), the reporting should be restricted to a single step. This can be achieved, for example, by adding:
@@ -57,7 +56,6 @@ on:
     types: [completed]
 
 jobs:
-
   post_pr_comment:
     runs-on: ubuntu-latest
     permissions:
@@ -66,6 +64,8 @@ jobs:
     steps:
 
       - uses: kostrykin/report-test-coverage-action@v1.1.0
+        with:
+          github-auth: ${{ secrets.GITHUB_TOKEN }}
 ```
 
 ## Examples
