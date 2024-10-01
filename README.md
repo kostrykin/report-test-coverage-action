@@ -12,22 +12,20 @@ Example badge generated using this action:
 
 [![Coverage](https://img.shields.io/endpoint?url=https://gist.githubusercontent.com/kostrykin/d152375a04f7ab9ee9b247de41245b24/raw/report-test-coverage-action.json)](https://github.com/kostrykin/report-test-coverage-action/actions/workflows/test.yml)
 
----
+## Installation
 
-**Steps required to set this action up for a repository:**
+### Create the main `test.yml` workflow
 
-1. The workflow should be triggered by `push` and `pull_request` events. For `push` events, make sure that the workflow is only triggered on the main branch, or whichever branch you want to be associated with the value reported by the generated badge:
+1. The main workflow should be given an expressive name, such as:
+   ```yml
+   name: Report test coverage
+   ```
+2. The main workflow should be triggered by `push` and `pull_request` events. For `push` events, make sure that the workflow is only triggered on the main branch, or whichever branch you want to be associated with the value reported by the generated badge:
    ```yml
    on:
      pull_request:
      push:
        branches: ['master']
-   ```
-2. Make sure the workflow job has the following permissions:
-   ```yml
-   permissions:
-     issues: write
-     pull-requests: write
    ```
 3. Create a Gist which will be used to store the values for the badge. To do that, simply create an empty Gist. You will need the ID of the Gist. If `https://gist.github.com/kostrykin/d152375a04f7ab9ee9b247de41245b24` is the URL of your Gist, then `d152375a04f7ab9ee9b247de41245b24` is the ID.
 4. Create a PAT with Gist permission, and add it as your `GIST_SECRET` by going to your repository **Settings > Secrets and variables > Actions > New repository secret**.
@@ -45,9 +43,35 @@ Example badge generated using this action:
    ```
    You can also specify a `working-directory` as a relative path to the root of the repository (e.g., `./example`) if your Python module and the corresponding `tests` directory are not direct descendents of the repository root.
 
-For a full example, see the workflow file *.github/workflows/example.yml* and the *example/* directory.
+For a full example, see the workflow file *.github/workflows/test.yml* and the *example/* directory.
 
-**List of further examples:**
+### Create the `post-comment.yml` workflow
+
+To report the test coverage as comments in pull requests, a second workflow must be set up. This is because the main workflow runs in the context of the base branch of the pull request (which potentially is a fork repository that has no permissions to post comments into the pull request of the upstream repository). The `post-comment.yml` workflow should look as follows:
+```yml
+name: Post pull request comment
+
+on:
+  workflow_run:
+    workflows: [Report test coverage]  # Replace this by EXACT NAME of the main workflow!
+    types: [completed]
+
+jobs:
+
+  post_pr_comment:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+
+      - uses: kostrykin/report-test-coverage-action@v1.1.0
+```
+
+## Examples
+
+List of further examples:
+
 - https://github.com/BMCV/giatools
 - https://github.com/BMCV/segmetrics
 - https://github.com/kosmotive/cs2pb
