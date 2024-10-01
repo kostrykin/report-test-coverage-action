@@ -118,7 +118,7 @@ runs:
       with:
         name: comment
         run-id: ${{ github.event.workflow_run.id }}
-        github-token: ${{ inputs.github_token }}
+        github-token: ${{ inputs.github-auth }}
 
     - name: Read comment artifact
       if: inputs.report == 'true' && github.event_name == 'workflow_run'
