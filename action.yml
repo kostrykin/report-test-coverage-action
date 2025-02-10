@@ -21,11 +21,6 @@ inputs:
     description: 'Report the test coverage.'
     default: 'true'
 
-  github-auth:
-    description: 'Authentication token used to comment on pull requests (only for the `workflow_run` trigger).'
-    required: 'true'
-    default: ${{ github.token }}
-
   gist-id:
     description: 'Gist ID where to store the coverage results (only for the `pull_requrst` and `push` triggers).'
     required: 'true'
@@ -48,10 +43,6 @@ runs:
 
   using: "composite"
   steps:
-
-  # --------------------------------------------------------------------------------------
-  # Pull request / Push
-  # --------------------------------------------------------------------------------------
 
     - name: Install dependencies
       if: github.event_name == 'pull_request' || github.event_name == 'push'
@@ -106,36 +97,3 @@ runs:
         minColorRange: 50
         maxColorRange: 90
         valColorRange: ${{ steps.coverage.outputs.coverage }}
-
-  # --------------------------------------------------------------------------------------
-  # Workflow run
-  # --------------------------------------------------------------------------------------
-
-    - name: Download the comment artifact
-      if: inputs.report == 'true' && github.event_name == 'workflow_run'
-      uses: actions/download-artifact@v4.1.8
-      continue-on-error: true
-      with:
-        name: comment
-        run-id: ${{ github.event.workflow_run.id }}
-        github-token: ${{ inputs.github-auth }}
-
-    - name: Read comment artifact
-      if: inputs.report == 'true' && github.event_name == 'workflow_run'
-      continue-on-error: true
-      shell: bash
-      run: echo "comment_json=$(jq -c . < comment.json)" >> $GITHUB_ENV
-
-    - name: Create the comment
-      if: inputs.report == 'true' && github.event_name == 'workflow_run'
-      uses: actions/github-script@v7
-      continue-on-error: true
-      with:
-        github-token: ${{ inputs.github-auth }}
-        script: |
-          github.rest.issues.createComment({
-            issue_number: ${{ fromJSON(env.comment_json).issue_number }},
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: '${{ fromJSON(env.comment_json).body }}'
-          })

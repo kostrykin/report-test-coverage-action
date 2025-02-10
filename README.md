@@ -63,7 +63,7 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
 
-      - uses: kostrykin/report-test-coverage-action@v1.1.0
+      - uses: kostrykin/post-gh-comment-from-artifact@v1.0.0
         with:
           github-auth: ${{ secrets.GITHUB_TOKEN }}
 ```
