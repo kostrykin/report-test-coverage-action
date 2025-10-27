@@ -80,7 +80,7 @@ runs:
 
     - name: Upload the comment as an artifact
       if: inputs.report == 'true' && github.event_name == 'pull_request'
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       with:
         name: comment
         path: comment.json
