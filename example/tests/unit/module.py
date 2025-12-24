@@ -1,6 +1,8 @@
 import module
 import unittest
 
+from .. import tools
+
 
 class ModuleTest(unittest.TestCase):
 
