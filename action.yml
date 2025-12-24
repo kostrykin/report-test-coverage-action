@@ -75,7 +75,7 @@ runs:
           if [[ -f "coverage-$group.json" ]]; then
             echo "coverage_$group=$(jq -r '[.totals.percent_covered_display][0]' coverage-$group.json)" >> $GITHUB_ENV
           else
-            echo "coverage_$group=\"unknown\"" >> $GITHUB_ENV
+            echo "coverage_$group=0" >> $GITHUB_ENV
           fi
         done
   
