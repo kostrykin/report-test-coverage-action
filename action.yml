@@ -64,8 +64,10 @@ runs:
             export GROUP_MODULE="tests.$GROUP"
           fi
           ${{ inputs.run }}
-          mv "coverage.json" "coverage-$GROUP.json"
-          rm .coverage
+          if [[ -f "coverage.json" ]]; then
+            mv "coverage.json" "coverage-$GROUP.json"
+            rm -f .coverage
+          fi
         done
 
     - name: Fetch coverage
@@ -74,7 +76,11 @@ runs:
       working-directory: ${{ inputs.working-directory }}
       run: |
         for group in "" "unit" "module" "integration"; do
-          echo "coverage_$group=$(jq -r '[.totals.percent_covered_display][0]' coverage-$group.json)" >> $GITHUB_ENV
+          if [[ -f "coverage-$group.json" ]]; then
+            echo "coverage_$group=$(jq -r '[.totals.percent_covered_display][0]' coverage-$group.json)" >> $GITHUB_ENV
+          else
+            echo "coverage_$group=\"unknown\" >> $GITHUB_ENV
+          fi
         done
   
     - name: Prepare a comment for the pull request
