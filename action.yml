@@ -105,7 +105,7 @@ runs:
         auth: ${{ inputs.gist-auth }}
         gistID: ${{ inputs.gist-id }}
         filename: ${{ inputs.gist-filename }}
-        label: ${{ inputs.badge-label }}
+        label: Coverage
         message: ${{ env.coverage_ }}%
         minColorRange: 50
         maxColorRange: 90
