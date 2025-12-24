@@ -85,7 +85,7 @@ runs:
       run: |
         echo "{
           \"issue_number\": $ISSUE_NUMBER,
-          \"body\": \"Test coverage results for $HEAD_SHA:\n- Unit tests: **$coverage_unit%**\n- Module tests: **$coverage_module%**\n- Integration tests: **$coverage_integration%**\n- Total coverage: **$coverage_%**\"
+          \"body\": \"Test coverage results for $HEAD_SHA:<ul><li>Unit tests: <b>$coverage_unit%</b></li><li>Module tests: <b>$coverage_module%</b></li><li>Integration tests: <b>$coverage_integration%</b></li><li>Total coverage: <b>$coverage_%</b></li></ul>\"
         }" >> comment.json
       env:
         ISSUE_NUMBER: ${{ github.event.number }}
