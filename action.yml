@@ -10,9 +10,8 @@ inputs:
   run:
     description: 'Commands to run the test suite and compute the test coverage (only for the `pull_requrst` and `push` triggers).'
     default: |
-      coverage run --source="tests/$GROUP" -m unittest discover
+      coverage run -m unittest discover -t "." -s "tests/$GROUP"
       python -m coverage json --omit "tests/*"
-      mv "coverage.json" "coverage-$GROUP.json"
 
   working-directory:
     description: 'Directory in which the test suite will be run (only for the `pull_requrst` and `push` triggers).'
@@ -64,6 +63,8 @@ runs:
             export GROUP_MODULE="tests.$GROUP"
           fi
           ${{ inputs.run }}
+          mv "coverage.json" "coverage-$GROUP.json"
+          rm .coverage
         done
 
     - name: Fetch coverage
