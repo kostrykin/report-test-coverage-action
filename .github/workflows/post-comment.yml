@@ -15,4 +15,4 @@ jobs:
 
       - uses: kostrykin/post-gh-comment-from-artifact-action@v1.0.2
         with:
-          github-auth: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
