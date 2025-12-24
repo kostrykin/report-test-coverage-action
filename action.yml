@@ -10,7 +10,7 @@ inputs:
   run:
     description: 'Commands to run the test suite and compute the test coverage (only for the `pull_requrst` and `push` triggers).'
     default: |
-      coverage run -m unittest discover --source=tests/$GROUP
+      coverage run --source="tests/$GROUP" -m unittest discover
       python -m coverage json --omit "tests/*"
       mv "coverage.json" "coverage-$GROUP.json"
 
