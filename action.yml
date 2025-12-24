@@ -64,6 +64,7 @@ runs:
             export GROUP_MODULE="tests.$GROUP"
           fi
           ${{ inputs.run }}
+          echo "---"
           if [[ -f "coverage.json" ]]; then
             mv "coverage.json" "coverage-$GROUP.json"
             rm -f .coverage
@@ -76,6 +77,7 @@ runs:
       working-directory: ${{ inputs.working-directory }}
       run: |
         for group in "" "unit" "module" "integration"; do
+          echo "*** Reading results for group \"$GROUP\" ***"
           if [[ -f "coverage-$group.json" ]]; then
             echo "coverage_$group=$(jq -r '[.totals.percent_covered_display][0]' coverage-$group.json)" >> $GITHUB_ENV
           else
