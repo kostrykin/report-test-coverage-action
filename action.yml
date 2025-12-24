@@ -34,14 +34,6 @@ inputs:
     description: 'Filename to assign to the gist (only for the `pull_requrst` and `push` triggers).'
     default: coverage.json
 
-  main-group:
-    description: 'The test group to report in the badge (must be one out of `unit`, `module`, `integration`).'
-    default: 'unit'
-
-  badge-label:
-    description: 'The label of the badge.'
-    default: 'Unit Test Coverage'
-
 outputs:
 
   coverage:
@@ -75,7 +67,7 @@ runs:
       shell: bash
       working-directory: ${{ inputs.working-directory }}
       run: |
-        for group in "unit" "module" "integration"; do
+        for group in "" "unit" "module" "integration"; do
           echo "coverage_$group=$(jq -r '[.totals.percent_covered_display][0]' coverage-$group.json)" >> $GITHUB_ENV
         done
   
@@ -85,7 +77,7 @@ runs:
       run: |
         echo "{
           \"issue_number\": $ISSUE_NUMBER,
-          \"body\": \"Test coverage results for $HEAD_SHA:\n- Unit tests: **$coverage_unit%**\n- Module tests: **$coverage_module%**\n- Integration tests: **$coverage_integration%**\"
+          \"body\": \"Test coverage results for $HEAD_SHA:\n- Unit tests: **$coverage_unit%**\n- Module tests: **$coverage_module%**\n- Integration tests: **$coverage_integration%**\n- Total coverage: **$coverage_%**\"
         }" >> comment.json
       env:
         ISSUE_NUMBER: ${{ github.event.number }}
@@ -106,7 +98,7 @@ runs:
         gistID: ${{ inputs.gist-id }}
         filename: ${{ inputs.gist-filename }}
         label: ${{ inputs.badge-label }}
-        message: ${{ env.${{ inputs.main-group }}_coverage }}%
+        message: ${{ env.coverage_ }}%
         minColorRange: 50
         maxColorRange: 90
-        valColorRange: ${{ env.${{ inputs.main-group }}_coverage }}
+        valColorRange: ${{ env.coverage_ }}
