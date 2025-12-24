@@ -31,7 +31,7 @@ Example badge generated using this action:
 4. Create a PAT with Gist permission, and add it as your `GIST_SECRET` by going to your repository **Settings > Secrets and variables > Actions > New repository secret**.
 5. Add the action to the workflow and replace `d152375a04f7ab9ee9b247de41245b24` by your Gist ID:
    ```yml
-   - uses: kostrykin/report-test-coverage-action@v2.0.0
+   - uses: kostrykin/report-test-coverage-action@v2.0.1
      with:
        gist-id: d152375a04f7ab9ee9b247de41245b24
        gist-auth: ${{ secrets.GIST_SECRET }}
