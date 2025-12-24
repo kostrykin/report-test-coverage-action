@@ -57,7 +57,7 @@ runs:
       working-directory: ${{ inputs.working-directory }}
       run: |
         for GROUP in "" "unit" "module" "integration"; do
-          echo "*** Running tests for group \"$GROUP\" ***""
+          echo "*** Running tests for group \"$GROUP\" ***"
           if [ -z "$GROUP" ]; then
             export GROUP_MODULE="tests"
           else
