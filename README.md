@@ -6,7 +6,7 @@ Determines the test coverage of a Python module using [*coverage.py*](https://co
 Generates a badge for the determined coverage when triggered by a `push` event.
 When triggered by a `pull_request` event, the determined coverage is added as a comment to the corresponding pull request.
 
-<img width="907" src="https://github.com/kostrykin/report-test-coverage-action/assets/6557139/75bab889-fd88-4ac1-91f9-22b6f2836783">
+<img width="909" height="282" alt="Bildschirmfoto 2025-12-24 um 16 08 51" src="https://github.com/user-attachments/assets/875d1eb0-ec97-474f-bb9a-b75bb4fe7849" />
 
 Example badge generated using this action:
 
@@ -31,7 +31,7 @@ Example badge generated using this action:
 4. Create a PAT with Gist permission, and add it as your `GIST_SECRET` by going to your repository **Settings > Secrets and variables > Actions > New repository secret**.
 5. Add the action to the workflow and replace `d152375a04f7ab9ee9b247de41245b24` by your Gist ID:
    ```yml
-   - uses: kostrykin/report-test-coverage-action@v1.1.0
+   - uses: kostrykin/report-test-coverage-action@v2.0.0
      with:
        gist-id: d152375a04f7ab9ee9b247de41245b24
        gist-auth: ${{ secrets.GIST_SECRET }}
@@ -63,9 +63,9 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
 
-      - uses: kostrykin/post-gh-comment-from-artifact-action@v1.0.0
+      - uses: kostrykin/post-gh-comment-from-artifact-action@v1.0.2
         with:
-          github-auth: ${{ secrets.GITHUB_TOKEN }}
+          signature: '<!-- report-test-coverage-action -->'
 ```
 
 ## Examples
