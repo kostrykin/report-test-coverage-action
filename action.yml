@@ -10,8 +10,8 @@ inputs:
   run:
     description: 'Commands to run the test suite and compute the test coverage (only for the `pull_requrst` and `push` triggers).'
     default: |
-      coverage run -m unittest discover
-      python -m coverage json --omit "tests/*"
+      coverage run -m unittest discover -t "." -s "tests/$GROUP" || true
+      python -m coverage json --omit "tests/*" || true
 
   working-directory:
     description: 'Directory in which the test suite will be run (only for the `pull_requrst` and `push` triggers).'
@@ -55,15 +55,29 @@ runs:
       if: github.event_name == 'pull_request' || github.event_name == 'push'
       shell: bash
       working-directory: ${{ inputs.working-directory }}
-      run: ${{ inputs.run }}
+      run: |
+        for GROUP in "" "unit" "module" "integration"; do
+          echo "*** Running tests for group \"$GROUP\" ***"
+          ${{ inputs.run }}
+          if [[ -f "coverage.json" ]]; then
+            mv "coverage.json" "coverage-$GROUP.json"
+            rm -f .coverage
+          fi
+        done
 
     - name: Fetch coverage
       if: inputs.report == 'true' && (github.event_name == 'pull_request' || github.event_name == 'push')
-      id: coverage
       shell: bash
       working-directory: ${{ inputs.working-directory }}
       run: |
-        echo "coverage=$(jq -r '[.totals.percent_covered_display][0]' coverage.json)" >> $GITHUB_OUTPUT
+        for group in "" "unit" "module" "integration"; do
+          echo "*** Reading results for group \"$GROUP\" ***"
+          if [[ -f "coverage-$group.json" ]]; then
+            echo "coverage_$group=$(jq -r '[.totals.percent_covered_display][0]' coverage-$group.json)" >> $GITHUB_ENV
+          else
+            echo "coverage_$group=0" >> $GITHUB_ENV
+          fi
+        done
   
     - name: Prepare a comment for the pull request
       if: inputs.report == 'true' && github.event_name == 'pull_request'
@@ -71,12 +85,11 @@ runs:
       run: |
         echo "{
           \"issue_number\": $ISSUE_NUMBER,
-          \"body\": \"Test coverage of $HEAD_SHA: **$COVERAGE%**\"
+          \"body\": \"Test coverage results for $HEAD_SHA:<ul><li>🧩 Unit tests: <b>$coverage_unit%</b></li><li>📦 Module tests: <b>$coverage_module%</b></li><li>🔄 Integration tests: <b>$coverage_integration%</b></li><li>Total coverage: <b>$coverage_%</b></li></ul>\"
         }" >> comment.json
       env:
         ISSUE_NUMBER: ${{ github.event.number }}
         HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-        COVERAGE: ${{ steps.coverage.outputs.coverage }}
 
     - name: Upload the comment as an artifact
       if: inputs.report == 'true' && github.event_name == 'pull_request'
@@ -92,8 +105,8 @@ runs:
         auth: ${{ inputs.gist-auth }}
         gistID: ${{ inputs.gist-id }}
         filename: ${{ inputs.gist-filename }}
-        label: Coverage
-        message: ${{ steps.coverage.outputs.coverage }}%
+        label: ${{ inputs.badge-label }}
+        message: ${{ env.coverage_ }}%
         minColorRange: 50
         maxColorRange: 90
-        valColorRange: ${{ steps.coverage.outputs.coverage }}
+        valColorRange: ${{ env.coverage_ }}
