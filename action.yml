@@ -10,8 +10,8 @@ inputs:
   run:
     description: 'Commands to run the test suite and compute the test coverage (only for the `pull_requrst` and `push` triggers).'
     default: |
-      coverage run -m unittest discover -t "." -s "tests/$GROUP" || true
-      python -m coverage json --omit "tests/*" || true
+      coverage run -m unittest discover -t "." -s "tests/$GROUP"
+      python -m coverage json --omit "tests/*"
 
   working-directory:
     description: 'Directory in which the test suite will be run (only for the `pull_requrst` and `push` triggers).'
